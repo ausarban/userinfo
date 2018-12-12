@@ -12,7 +12,7 @@ namespace UserRecords
     class Program
     {
         private const string baseUrl = "https://jsonplaceholder.typicode.com/";
-        private static readonly IList<int> validIds = new ReadOnlyCollection<int>(new List<int> { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 });  
+        private static readonly ReadOnlyCollection<int> validIds = new ReadOnlyCollection<int>(new List<int> { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 });
         static void Main(string[] args)
         {
             Program program = new Program();
@@ -36,14 +36,14 @@ namespace UserRecords
 
                 List<UserRecord> users = program.GetUserRecords(user).GetAwaiter().GetResult();
 
-                for (var i = 0; i < users.Count; i++)
+                for (var i = 0; i < users.Count; i++) //Display as many records are found.
                     Console.WriteLine(string.Format(" {0} - {1} ", users[i].Name, users[i].Body));
 
                 Console.ReadLine();
 
-            }catch(Exception ex)
+            }catch(Exception ex) //We would normally log the exception here and handle it accordingly.
             {
-                Console.WriteLine(string.Format("Something went wrong... Application is stopping for...{0}", ex.Message)); //We would normally log the exception here and handle it accordingly.
+                Console.WriteLine(string.Format("Something went wrong... Application is stopping for...{0}", ex.Message)); 
                 Task.Delay(5000);
                 return;
             }
@@ -51,7 +51,9 @@ namespace UserRecords
         }
 
         public async Task<List<User>> GetUser(int id)
-        {            
+        {
+            var user = new List<User>(); //User needs to be a list because the structure of the JSON is an array.
+
             try
             {
                 var client = new HttpClient(); //we wont need any headers here
@@ -61,14 +63,14 @@ namespace UserRecords
                 response.EnsureSuccessStatusCode(); //throws an exception if API isn't happy with request.
 
                 string record = await response.Content.ReadAsStringAsync();
-                var user = JsonConvert.DeserializeObject<List<User>>(record); //Json is coming in as an array so let's deserialize to a list.
+                user = JsonConvert.DeserializeObject<List<User>>(record); //Json is coming in as an array so let's deserialize to a list.
 
                 client.Dispose(); // dispose the resources after our client is done here. 
                 return user;
             }
             catch (Exception e) 
             {
-                Console.WriteLine(string.Format("An Exception has occured, Application is stopping with... {0}", e.Message));
+                Console.WriteLine(string.Format("An Exception has occured... {0}", e.Message));
                 return null;
             }
         }
@@ -98,7 +100,7 @@ namespace UserRecords
             }
             catch (Exception e)
             {
-                Console.WriteLine(string.Format("An Exception has occured, Application is stopping with... {0}", e.Message));
+                Console.WriteLine(string.Format("An Exception has occured... {0}", e.Message));
 
                 return null;
             }
